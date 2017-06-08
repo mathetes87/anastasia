@@ -32,8 +32,8 @@ def main(im):
     image = np.expand_dims(np.array(im), axis=0) / 255.
 
     try:
-        reg_model = load_model('regression_model.hdf5')
-        clas_model = load_model('classification_model.hdf5')
+        reg_model = load_model('../modelos/regression_model.hdf5')
+        clas_model = load_model('../modelos/classification_model.hdf5')
     except Exception, e:
         print("Error en lectura de modelos: {}".format(e))
         sys.exit()
