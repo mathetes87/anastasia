@@ -1,6 +1,4 @@
-import os, requests
-folder_path = '/home/mathetes/Desktop/SVHN/Redes/glucometros_clasificacion_end_to_end'
-os.chdir(folder_path)
+import requests
 
 with open('0.jpg', 'rb') as f: 
     r = requests.post(
