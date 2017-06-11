@@ -1,3 +1,4 @@
+from bottledaemon import daemon_run
 from bottle import BaseRequest, request, run, post, route
 from PIL import Image
 from StringIO import StringIO
@@ -27,3 +28,6 @@ def test():
     return("Hello world!")
 
 run(host='0.0.0.0', port=8080, debug=True)
+
+if __name__ == "__main__":
+  daemon_run()
