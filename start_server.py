@@ -1,4 +1,4 @@
-from bottle import BaseRequest, request, run, post
+from bottle import BaseRequest, request, run, post, route
 from PIL import Image
 from StringIO import StringIO
 import read_single_image
@@ -18,5 +18,9 @@ def inference():
     }
     
     return response
+
+@route('/test')
+def test():
+    return("Hello world!")
 
 run(host='0.0.0.0', port=8080, debug=True)
