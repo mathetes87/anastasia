@@ -1,4 +1,3 @@
-from bottledaemon import daemon_run
 from keras.models import load_model, model_from_json
 from bottle import BaseRequest, request, run, post, route
 from PIL import Image
@@ -99,6 +98,3 @@ def test():
     return("Hello world!")
 
 run(host='0.0.0.0', port=8080, debug=True)
-
-#if __name__ == "__main__":
-#  daemon_run(host='0.0.0.0', port=8080)
