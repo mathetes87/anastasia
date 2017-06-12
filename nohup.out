@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "start_server_v2.py", line 1, in <module>
+    from bottledaemon import daemon_run
+ImportError: No module named bottledaemon
+Using TensorFlow backend.
+usage: start_server_v2.py [-h] {start,stop}
+start_server_v2.py: error: too few arguments
+Modelo regression cargado en memoria.
+Modelo classification cargado en memoria.
+Using TensorFlow backend.
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://0.0.0.0:8080/
+Hit Ctrl-C to quit.
+
+190.162.33.58 - - [12/Jun/2017 20:18:35] "GET /test HTTP/1.1" 200 12
+190.162.33.58 - - [12/Jun/2017 20:18:36] "GET /favicon.ico HTTP/1.1" 404 745
+190.162.33.58 - - [12/Jun/2017 20:19:07] "POST /inference HTTP/1.1" 200 59
+190.162.33.58 - - [12/Jun/2017 20:19:15] "POST /inference HTTP/1.1" 200 59
+190.162.33.58 - - [12/Jun/2017 20:19:22] "POST /inference HTTP/1.1" 200 59
+190.162.33.58 - - [12/Jun/2017 20:19:25] "POST /inference HTTP/1.1" 200 59
+190.162.33.58 - - [12/Jun/2017 20:19:28] "POST /inference HTTP/1.1" 200 57
+190.162.33.58 - - [12/Jun/2017 20:19:59] "POST /inference HTTP/1.1" 200 59

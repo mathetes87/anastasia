@@ -40,12 +40,13 @@ def load_models(model_name):
     return loaded_model, graph
 
 # cargar modelos en memoria
-global reg_model, clas_model  
+global reg_model, clas_model, reg_graph, clas_graph  
 reg_model, reg_graph = load_models('regression')
 clas_model, clas_graph = load_models('classification')
     
 @post('/inference')
 def inference():
+    print("Inference")
     t0 = time.time()
     data = request.files.image
         
@@ -64,17 +65,24 @@ def inference():
     image = np.expand_dims(np.array(im), axis=0) / 255.
     
     # obtener bbox
+    print("Regression")
     with reg_graph.as_default():
-        regression = reg_model.predict(image)[0]
-        x1, y1, x2, y2 = regression    
+        print "1"
+	regression = reg_model.predict(image)[0]
+        print "2"
+	x1, y1, x2, y2 = regression    
     # recortar imagen con bbox y pasar a formato de siguiente modelo
+    print "3"
     dig = im.crop([x1, y1, x2, y2])
+    print "4"
     dig = square_image(dig, DIGITS_NEW_SIZE)
+    print "5"
     dig = dig.resize((DIGITS_NEW_SIZE, DIGITS_NEW_SIZE), resample=Image.BICUBIC)   
         
     digits = np.expand_dims(np.array(dig), axis=0) / 255.
     
     # finalmente encontrar digitos
+    print("Classification")
     with clas_graph.as_default():
         classification = clas_model.predict(digits)
         result = ''.join([str(np.argmax(y_)) if np.argmax(y_) != 10 else '' for y_ in classification])
@@ -83,6 +91,7 @@ def inference():
         'tiempo_inferencia': time.time() - t0
     }
     
+    print("Return")
     return response
 
 @route('/test')
