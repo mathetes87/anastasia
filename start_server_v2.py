@@ -3,8 +3,10 @@ from bottle import BaseRequest, request, run, post, route
 from PIL import Image
 from StringIO import StringIO
 import numpy as np
-import time, sys, os
+from time import time, gmtime, strftime
+import sys, os, uuid
 import tensorflow as tf
+#from azure.storage.blob import ContentSettings
 
 # aumentar peso maximo de archivo a recibir, en bytes
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 10 # 10 MB max
@@ -42,11 +44,19 @@ def load_models(model_name):
 global reg_model, clas_model, reg_graph, clas_graph  
 reg_model, reg_graph = load_models('regression')
 clas_model, clas_graph = load_models('classification')
+
+def save_image(image):
+    #block_blob_service.put_blob(
+    #    'glucometros',
+    #    'myblockblob',
+    #    'sunset.png',
+    #    content_settings=ContentSettings(content_type='image/png')
+    #)
+    pass
     
 @post('/inference')
 def inference():
-    print("Inference")
-    t0 = time.time()
+    t0 = time()
     data = request.files.image
         
     raw = data.file.read()
@@ -64,33 +74,27 @@ def inference():
     image = np.expand_dims(np.array(im), axis=0) / 255.
     
     # obtener bbox
-    print("Regression")
     with reg_graph.as_default():
-        print "1"
-	regression = reg_model.predict(image)[0]
-        print "2"
-	x1, y1, x2, y2 = regression    
+	    regression = reg_model.predict(image)[0]
+	    x1, y1, x2, y2 = regression    
     # recortar imagen con bbox y pasar a formato de siguiente modelo
-    print "3"
     dig = im.crop([x1, y1, x2, y2])
-    print "4"
     dig = square_image(dig, DIGITS_NEW_SIZE)
-    print "5"
     dig = dig.resize((DIGITS_NEW_SIZE, DIGITS_NEW_SIZE), resample=Image.BICUBIC)   
         
     digits = np.expand_dims(np.array(dig), axis=0) / 255.
     
     # finalmente encontrar digitos
-    print("Classification")
     with clas_graph.as_default():
         classification = clas_model.predict(digits)
         result = ''.join([str(np.argmax(y_)) if np.argmax(y_) != 10 else '' for y_ in classification])
     response = {
         'lectura': result,
-        'tiempo_inferencia': time.time() - t0
+        'tiempo_inferencia': time() - t0,
+        'time_utc': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+        'storage': "entregar_id_unico_de_archivo"
     }
     
-    print("Return")
     return response
 
 @route('/test')
