@@ -97,6 +97,48 @@ def inference():
     
     return response
 
+@post('/inferencev2')
+def inferencev2():
+    t0 = time()
+    raw = request.files.image
+        
+    im = Image.open(StringIO(raw))
+    
+    # parametros a ocupar
+    GLUC_NEW_SIZE = 96
+    DIGITS_NEW_SIZE = 48
+        
+    # transformar imagen
+    im = square_image(im, new_side=GLUC_NEW_SIZE)
+    im = im.resize((GLUC_NEW_SIZE, GLUC_NEW_SIZE), resample=Image.BICUBIC)
+    
+    # pasar a formato que recibe el modelo, en numpy
+    image = np.expand_dims(np.array(im), axis=0) / 255.
+    
+    # obtener bbox
+    with reg_graph.as_default():
+	    regression = reg_model.predict(image)[0]
+	    x1, y1, x2, y2 = regression    
+    # recortar imagen con bbox y pasar a formato de siguiente modelo
+    dig = im.crop([x1, y1, x2, y2])
+    dig = square_image(dig, DIGITS_NEW_SIZE)
+    dig = dig.resize((DIGITS_NEW_SIZE, DIGITS_NEW_SIZE), resample=Image.BICUBIC)   
+        
+    digits = np.expand_dims(np.array(dig), axis=0) / 255.
+    
+    # finalmente encontrar digitos
+    with clas_graph.as_default():
+        classification = clas_model.predict(digits)
+        result = ''.join([str(np.argmax(y_)) if np.argmax(y_) != 10 else '' for y_ in classification])
+    response = {
+        'lectura': result,
+        'tiempo_inferencia': time() - t0,
+        'time_utc': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+        'storage': "entregar_id_unico_de_archivo"
+    }
+    
+    return response
+
 @route('/test')
 def test():
     return("Hello world!")
