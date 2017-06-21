@@ -8,6 +8,8 @@ import sys, os, uuid
 import tensorflow as tf
 from io import BytesIO
 import base64
+import urllib
+import json
 #from azure.storage.blob import ContentSettings
 
 # aumentar peso maximo de archivo a recibir, en bytes
@@ -102,7 +104,13 @@ def inference():
 @post('/inferencev2')
 def inferencev2():
     t0 = time()
-    raw = request.files.image.file.read()
+    
+    body = request.body.read()
+    parsedBody = urllib.unquote(body).decode('utf8')
+    
+    jsonObj = json.loads(parsedBody)
+    raw = jsonObj['image'] 
+    raw = raw.replace('data:image/jpeg;base64,', '')
         
     im = Image.open(BytesIO(base64.b64decode(raw)))
     
