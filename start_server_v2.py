@@ -6,6 +6,8 @@ import numpy as np
 from time import time, gmtime, strftime
 import sys, os, uuid
 import tensorflow as tf
+from io import BytesIO
+import base64
 #from azure.storage.blob import ContentSettings
 
 # aumentar peso maximo de archivo a recibir, en bytes
@@ -100,9 +102,9 @@ def inference():
 @post('/inferencev2')
 def inferencev2():
     t0 = time()
-    raw = request.files.image
+    raw = request.files.image.file.read()
         
-    im = Image.open(StringIO(raw))
+    im = Image.open(BytesIO(base64.b64decode(raw)))
     
     # parametros a ocupar
     GLUC_NEW_SIZE = 96
